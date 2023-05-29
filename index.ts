@@ -1,15 +1,26 @@
 import { Server } from "socket.io";
 import Events from "./Domain/events";
+import JoinQuizMessage from "./Domain/JoinQuizMessage";
+import SetQuizPosition from "./Domain/SetQuizPosition";
 
 const io = new Server({ /* options */ });
 
 io.on(Events.connection, (socket) => {
-    console.log("a user connected");
-    console.log(socket.handshake.headers);
+    const userToken = socket.handshake.headers.authorization;
+    console.log(`User ${userToken} connected`);
 
-    socket.on("test", (msg) => {
-        console.log("test", msg);
-        socket.emit("testres", { msg: "testres" });
+    socket.on(Events.joinQuiz, (msg: JoinQuizMessage) => {
+        const room = `${msg.quizId}-${msg.adminId}`;
+        socket.join(room);
+        console.log(`user ${userToken} joined room ${room}`);
+        //TODO: Persist room to volatile database?
+    });
+
+    socket.on(Events.setQuizPosition, (msg: SetQuizPosition) => {
+        //TODO: Validate userToken admin role
+        const room = `${msg.quizId}-${userToken}`;
+        console.log(`user set quiz position in room ${room}`);
+        socket.to(room).emit(Events.sendQuizPosition, msg.position);
     });
 
     socket.on(Events.disconnect, () => {
