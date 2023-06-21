@@ -3,7 +3,11 @@ import Events from "./Domain/events";
 import JoinQuizMessage from "./Domain/JoinQuizMessage";
 import SetQuizPosition from "./Domain/SetQuizPosition";
 
-const io = new Server({ /* options */ });
+const io = new Server({
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
 
 io.on(Events.connection, (socket) => {
     const userToken = socket.handshake.headers.authorization;
