@@ -11,6 +11,7 @@ const io = new Server({
         origin: CORS_ORIGIN,
         methods: ["GET", "POST", "OPTIONS"],
         allowedHeaders: ["Content-Type", "x-requested-with"],
+        credentials: true,
     }
 });
 

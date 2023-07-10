@@ -8,6 +8,7 @@ var io = new socket_io_1.Server({
         origin: config_1.CORS_ORIGIN,
         methods: ["GET", "POST", "OPTIONS"],
         allowedHeaders: ["Content-Type", "x-requested-with"],
+        credentials: true,
     }
 });
 io.on(Events_1.default.connection, function (socket) {
