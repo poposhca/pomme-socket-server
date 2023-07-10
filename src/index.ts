@@ -9,8 +9,8 @@ import { PORT, CORS_ORIGIN } from "../config";
 const io = new Server({
     cors: {
         origin: CORS_ORIGIN,
-        methods: ["GET", "POST", "PUT", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "x-requested-with", "Authorization"],
+        methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
+        allowedHeaders: ["Content-Type", "X-Requested-With", "Authorization"],
         credentials: true,
     }
 });
