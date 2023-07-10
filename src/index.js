@@ -38,3 +38,4 @@ io.on(Events_1.default.connection, function (socket) {
     });
 });
 io.listen(config_1.PORT);
+console.log("Socket Server listening on port: ".concat(config_1.PORT));

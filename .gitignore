@@ -2,4 +2,5 @@
 .idea
 .vscode
 index.js
+.env
 node_modules

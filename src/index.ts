@@ -47,3 +47,5 @@ io.on(Events.connection, (socket) => {
 });
 
 io.listen(PORT);
+
+console.log(`Socket Server listening on port: ${PORT}`)
