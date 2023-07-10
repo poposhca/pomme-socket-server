@@ -9,7 +9,7 @@ import { PORT, CORS_ORIGIN } from "../config";
 const io = new Server({
     cors: {
         origin: CORS_ORIGIN,
-        methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         allowedHeaders: ["Content-Type", "X-Requested-With", "Authorization"],
         credentials: true,
     }
