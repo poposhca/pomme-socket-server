@@ -6,8 +6,8 @@ var config_1 = require("../config");
 var io = new socket_io_1.Server({
     cors: {
         origin: config_1.CORS_ORIGIN,
-        methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "x-requested-with"],
+        methods: ["GET", "POST", "PUT", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "x-requested-with", "Authorization"],
         credentials: true,
     }
 });
