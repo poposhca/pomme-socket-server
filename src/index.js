@@ -6,6 +6,8 @@ var config_1 = require("../config");
 var io = new socket_io_1.Server({
     cors: {
         origin: config_1.CORS_ORIGIN,
+        methods: ["GET", "POST", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "x-requested-with"],
     }
 });
 io.on(Events_1.default.connection, function (socket) {
@@ -38,4 +40,4 @@ io.on(Events_1.default.connection, function (socket) {
     });
 });
 io.listen(config_1.PORT);
-console.log("Socket Server listening on port: ".concat(config_1.PORT));
+console.log("Socket Server listening on port: ".concat(config_1.PORT, "\nCORS config: ").concat(config_1.CORS_ORIGIN));

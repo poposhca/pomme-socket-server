@@ -9,6 +9,8 @@ import { PORT, CORS_ORIGIN } from "../config";
 const io = new Server({
     cors: {
         origin: CORS_ORIGIN,
+        methods: ["GET", "POST", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "x-requested-with"],
     }
 });
 
@@ -48,4 +50,4 @@ io.on(Events.connection, (socket) => {
 
 io.listen(PORT);
 
-console.log(`Socket Server listening on port: ${PORT}`)
+console.log(`Socket Server listening on port: ${PORT}\nCORS config: ${CORS_ORIGIN}`)
