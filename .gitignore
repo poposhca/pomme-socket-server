@@ -1,6 +1,6 @@
 
 .idea
 .vscode
-index.js
 .env
+dist
 node_modules

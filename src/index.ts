@@ -1,12 +1,17 @@
+import * as express from "express";
+import { createServer } from "http";
 import { Server } from "socket.io";
 import Events from "./domain/Events";
 import JoinQuizMessage from "./domain/JoinQuizMessage";
 import SetQuizPosition from "./domain/SetQuizPosition";
 import SendAnswersMessage from "./domain/SendAnswersMessage";
 import ReceiveAnswerMessage from "./domain/ReceiveAnswerMessage";
-import { PORT, CORS_ORIGIN } from "../config";
+import { PORT, CORS_ORIGIN } from "./config";
 
-const io = new Server({
+const app = express();
+const httpServer = createServer(app);
+
+const io = new Server(httpServer,{
     cors: {
         origin: CORS_ORIGIN,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -48,6 +53,6 @@ io.on(Events.connection, (socket) => {
     });
 });
 
-io.listen(PORT);
-
-console.log(`Socket Server listening on port: ${PORT}\nCORS config: ${CORS_ORIGIN}`)
+httpServer.listen(PORT, () => {
+    console.log(`POMME Socket Server listening on port: ${PORT}\nCORS origin config: ${CORS_ORIGIN}`);
+});
