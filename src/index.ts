@@ -15,7 +15,8 @@ const io = new Server(httpServer,{
     cors: {
         origin: CORS_ORIGIN,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        allowedHeaders: '*'
+        allowedHeaders: '*',
+        credentials: true
     }
 });
 
