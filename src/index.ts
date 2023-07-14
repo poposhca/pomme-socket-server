@@ -14,8 +14,8 @@ const httpServer = createServer(app);
 const io = new Server(httpServer,{
     cors: {
         origin: CORS_ORIGIN,
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        allowedHeaders: ["Content-Type", "X-Requested-With", "Authorization", "X-PINGOTHER", "Content-Type"]
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        allowedHeaders: '*'
     }
 });
 
