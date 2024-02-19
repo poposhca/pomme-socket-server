@@ -32,7 +32,7 @@ io.on(Events.connection, (socket) => {
         const room = `${msg.quizId}-${msg.adminId}`;
         socket.join(room);
         console.log(`user ${userToken} joined room ${room}`);
-        adapters.dbAdapter.readStream({ quizStartTime: 1708374578733 });
+        adapters.dbAdapter.readStream({ quizStartTime: "1708374578733" });
     });
 
     socket.on(Events.setQuizPosition, (msg: SetQuizPosition) => {
