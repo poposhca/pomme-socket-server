@@ -2,7 +2,7 @@ import * as express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-streams-adapter";
-import { createClient } from "redis";
+import adapters from "./adapters";
 import Events from "./domain/Events";
 import JoinQuizMessage from "./domain/JoinQuizMessage";
 import SetQuizPosition from "./domain/SetQuizPosition";
@@ -22,17 +22,6 @@ const io = new Server(httpServer,{
     }
 });
 
-// SET REDIS CONNECTION
-
-const redisPubClient = createClient({
-    url:'redis://localhost:6379'
-});
-
-redisPubClient.on("error", (error) => {
-    console.log("Error!!!!");
-    console.error(error.message);
-});
-
 // SET EVENT LISTENERS
 
 io.on(Events.connection, (socket) => {
@@ -43,14 +32,14 @@ io.on(Events.connection, (socket) => {
         const room = `${msg.quizId}-${msg.adminId}`;
         socket.join(room);
         console.log(`user ${userToken} joined room ${room}`);
-        //TODO: Persist room to volatile database?
+        adapters.dbAdapter.readStream({ quizStartTime: 1708374578733 });
     });
 
     socket.on(Events.setQuizPosition, (msg: SetQuizPosition) => {
         //TODO: Validate userToken admin role to use its Token
         const room = `${msg.quizId}-${userToken}`;
         console.log(`user set quiz position in room ${room}`);
-        io.emit(Events.sendQuizPosition, msg.position);
+        io.to(room).emit(Events.sendQuizPosition, msg.position);
     });
 
     socket.on(Events.sendAnswers, (msg: SendAnswersMessage) => {
@@ -70,15 +59,13 @@ io.on(Events.connection, (socket) => {
 });
 
 // SET HTTP SERVER
-Promise.all([redisPubClient.connect()]).then(() => {
-    io.adapter(createAdapter(redisPubClient));
-    io.of("/").adapter.on("create-room", (room) => {
-        console.log(`room ${room} was created`);
-    });
-    io.of("/").adapter.on("join-room", (room, id) => {
-        console.log(`socket ${id} has joined room ${room}`);
-    });
+adapters.dbAdapter.connect().then(() => {
+    io.adapter(createAdapter(adapters.dbAdapter.dbInstance));
     httpServer.listen(PORT, () => {
         console.log(`POMME Socket Server listening on port: ${PORT}\nCORS origin config: ${CORS_ORIGIN}`);
     });
+
+}).catch((error) => {
+    console.error(`Error initiating server\N${error.message}`);
+    process.exit(1);
 });
