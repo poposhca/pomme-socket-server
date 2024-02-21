@@ -16,11 +16,11 @@ socket.on('disconnect', () => {
 });
 
 socket.emit('joinQuiz', {
-    quizId: '111',
+    quizId: '112',
     adminId: '466',
 });
 
 socket.emit('setQuizPosition', {
-    quizId: '111',
-    position: 2,
+    quizId: '113',
+    position: 1,
 });
