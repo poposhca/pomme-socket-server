@@ -1,7 +1,6 @@
 import * as express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createAdapter } from "@socket.io/redis-streams-adapter";
 import adapters from "./adapters";
 import Events from "./domain/Events";
 import JoinQuizMessage from "./domain/JoinQuizMessage";
@@ -28,17 +27,28 @@ io.on(Events.connection, (socket) => {
     const userToken = socket.handshake.headers.authorization;
     console.log(`User ${userToken} connected`);
 
-    socket.on(Events.joinQuiz, (msg: JoinQuizMessage) => {
+    socket.on(Events.joinQuiz, async  (msg: JoinQuizMessage) => {
         const room = `${msg.quizId}-${msg.adminId}`;
         socket.join(room);
         console.log(`user ${userToken} joined room ${room}`);
-        adapters.dbAdapter.readStream({ quizStartTime: "1708374578733" });
+        const currentPosition = await adapters.dbAdapter.readStreamLatestEntry({
+            streamName: `stream:${room}`,
+            quizId: msg.quizId,
+            adminId: msg.adminId,
+        });
+        console.log(currentPosition);
+        socket.emit(Events.sendQuizPosition, currentPosition);
     });
 
     socket.on(Events.setQuizPosition, (msg: SetQuizPosition) => {
         //TODO: Validate userToken admin role to use its Token
         const room = `${msg.quizId}-${userToken}`;
         console.log(`user set quiz position in room ${room}`);
+        adapters.dbAdapter.writeStream({
+            streamKey: `stream:${room}`,
+            id: msg.quizId,
+            positionMessage: msg.position.toString(),
+        });
         io.to(room).emit(Events.sendQuizPosition, msg.position);
     });
 
@@ -60,7 +70,6 @@ io.on(Events.connection, (socket) => {
 
 // SET HTTP SERVER
 adapters.dbAdapter.connect().then(() => {
-    io.adapter(createAdapter(adapters.dbAdapter.dbInstance));
     httpServer.listen(PORT, () => {
         console.log(`POMME Socket Server listening on port: ${PORT}\nCORS origin config: ${CORS_ORIGIN}`);
     });

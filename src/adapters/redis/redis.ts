@@ -1,5 +1,4 @@
 import { createClient } from "redis";
-import {json} from "express";
 
 class RedisAdapter {
     private _dbInstance: any;
@@ -22,16 +21,26 @@ class RedisAdapter {
         }
     }
 
-    public async readStream({ quizStartTime }: { quizStartTime: string }) {
+    public async writeStream({ streamKey, id, positionMessage }: { streamKey: string, id: string, positionMessage: string }) {
         try {
-            const results = await this.dbInstance.xRevRange("socket.io", "+", quizStartTime);
-            const messagesFilter = results.filter((result: any) => result.message.type === "3");
-            for (const result of messagesFilter) {
-                const data = JSON.parse(result.message.data);
-                console.log(`Stream result: ${data.opts.rooms[0]}`);
-            }
+            const position = { position: positionMessage }
+            await this.dbInstance.xAdd(streamKey, '*', position);
         } catch (error) {
-            throw new Error(`Error reading stream: ${error.message}`);
+            throw new Error(`Error writing to stream: ${error}`);
+        }
+    }
+
+    public async readStreamLatestEntry({ streamName, quizId, adminId }: { streamName: string, quizId: string, adminId: string }) : Promise<number> {
+        try {
+            const results = await this.dbInstance.xRevRange(streamName, '+', '-', 'LIMIT', 0, 1);
+            console.log(results);
+            if(results.length === 0) {
+                return 0;
+            }
+            const topResult = results[0];
+            return topResult.message.position;
+        } catch (error) {
+            throw new Error(`Error reading stream: ${error}`);
         }
     }
 }
