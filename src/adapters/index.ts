@@ -1,8 +1,9 @@
 import RedisAdapter from "./redis/redis";
+import { REDIS_URL } from "../config";
 
 const adapters = {
     dbAdapter: new RedisAdapter({
-        url: "redis://localhost:6379",
+        url: REDIS_URL
     }),
 };
 
