@@ -36,7 +36,6 @@ io.on(Events.connection, (socket) => {
             quizId: msg.quizId,
             adminId: msg.adminId,
         });
-        console.log(currentPosition);
         socket.emit(Events.sendQuizPosition, currentPosition);
     });
 
@@ -53,7 +52,6 @@ io.on(Events.connection, (socket) => {
     });
 
     socket.on(Events.sendAnswers, (msg: SendAnswersMessage) => {
-        console.log(`user ${userToken} sent answers ${msg.answers}`);
         //TODO: add validation to send only to admin host
         const adminMsg: ReceiveAnswerMessage = {
             userId: userToken,
