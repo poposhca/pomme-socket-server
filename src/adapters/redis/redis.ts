@@ -33,7 +33,6 @@ class RedisAdapter {
     public async readStreamLatestEntry({ streamName, quizId, adminId }: { streamName: string, quizId: string, adminId: string }) : Promise<number> {
         try {
             const results = await this.dbInstance.xRevRange(streamName, '+', '-', 'LIMIT', 0, 1);
-            console.log(results);
             if(results.length === 0) {
                 return 0;
             }
