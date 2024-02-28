@@ -1,6 +1,8 @@
+import 'dotenv/config'
 import * as express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import adapters from "./adapters";
 import Events from "./domain/Events";
 import JoinQuizMessage from "./domain/JoinQuizMessage";
 import SetQuizPosition from "./domain/SetQuizPosition";
@@ -20,26 +22,37 @@ const io = new Server(httpServer,{
     }
 });
 
+// SET EVENT LISTENERS
+
 io.on(Events.connection, (socket) => {
     const userToken = socket.handshake.headers.authorization;
     console.log(`User ${userToken} connected`);
 
-    socket.on(Events.joinQuiz, (msg: JoinQuizMessage) => {
+    socket.on(Events.joinQuiz, async  (msg: JoinQuizMessage) => {
         const room = `${msg.quizId}-${msg.adminId}`;
         socket.join(room);
         console.log(`user ${userToken} joined room ${room}`);
-        //TODO: Persist room to volatile database?
+        const currentPosition = await adapters.dbAdapter.readStreamLatestEntry({
+            streamName: `stream:${room}`,
+            quizId: msg.quizId,
+            adminId: msg.adminId,
+        });
+        socket.emit(Events.sendQuizPosition, currentPosition);
     });
 
     socket.on(Events.setQuizPosition, (msg: SetQuizPosition) => {
         //TODO: Validate userToken admin role to use its Token
         const room = `${msg.quizId}-${userToken}`;
         console.log(`user set quiz position in room ${room}`);
-        socket.to(room).emit(Events.sendQuizPosition, msg.position);
+        adapters.dbAdapter.writeStream({
+            streamKey: `stream:${room}`,
+            id: msg.quizId,
+            positionMessage: msg.position.toString(),
+        });
+        io.to(room).emit(Events.sendQuizPosition, msg.position);
     });
 
     socket.on(Events.sendAnswers, (msg: SendAnswersMessage) => {
-        console.log(`user ${userToken} sent answers ${msg.answers}`);
         //TODO: add validation to send only to admin host
         const adminMsg: ReceiveAnswerMessage = {
             userId: userToken,
@@ -54,6 +67,13 @@ io.on(Events.connection, (socket) => {
     });
 });
 
-httpServer.listen(PORT, () => {
-    console.log(`POMME Socket Server listening on port: ${PORT}\nCORS origin config: ${CORS_ORIGIN}`);
+// SET HTTP SERVER
+adapters.dbAdapter.connect().then(() => {
+    httpServer.listen(PORT, () => {
+        console.log(`POMME Socket Server listening on port: ${PORT}\nCORS origin config: ${CORS_ORIGIN}`);
+    });
+
+}).catch((error) => {
+    console.error(`Error initiating server\N${error.message}`);
+    process.exit(1);
 });

@@ -4,7 +4,7 @@ WORKDIR /app
 ENV PORT=8080
 ENV CORS_ORIGIN="http://localhost:5173"
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 COPY . .
 RUN npm run build
 EXPOSE $PORT
