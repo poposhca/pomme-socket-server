@@ -1,6 +1,10 @@
 {
   "include": ["src/**/*"],
   "compilerOptions": {
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true
+  },
+  "exclude": ["node_modules"]
 }
