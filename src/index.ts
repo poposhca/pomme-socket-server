@@ -1,5 +1,5 @@
-import 'dotenv/config'
-import * as express from "express";
+import 'dotenv/config';
+import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import adapters from "./adapters";
