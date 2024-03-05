@@ -1,5 +1,6 @@
 import RedisAdapter from "./redis/redis";
 import { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } from "../config";
+console.log(`PORT: ${REDIS_PORT}`);
 
 const adapters = {
     dbAdapter: new RedisAdapter({

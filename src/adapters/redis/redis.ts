@@ -8,6 +8,7 @@ class RedisAdapter {
     }
 
     constructor({ url }: { url: string }) {
+        console.log(`URL: ${url}`);
         this._dbInstance = createClient({
             url,
         });
