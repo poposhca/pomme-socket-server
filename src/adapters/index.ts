@@ -1,4 +1,4 @@
-import RedisAdapter from "./redis/redis";
+import RedisAdapter from "./redis";
 import { REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD } from "../config";
 console.log(`PORT: ${REDIS_PORT}`);
 
