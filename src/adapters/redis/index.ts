@@ -8,9 +8,15 @@ class RedisAdapter {
     }
 
     constructor({ url }: { url: string }) {
-        this._dbInstance = createClient({
+        console.log(`URL: ${url}`);
+        const newClient = createClient({
             url,
         });
+        newClient.on('connect', () => console.log('Redis Client Connected'))
+            .on('ready', () => console.log('Redis Client Ready'))
+            .on('error', err => console.log(`Redis Client Error ${err}`))
+            .on('reconnecting', () => console.log('Redis Client Reconnecting'));
+        this._dbInstance = newClient;
     }
 
     public async connect() {
